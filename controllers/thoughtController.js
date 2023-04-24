@@ -1,6 +1,6 @@
 const { user, Thought } = require("../models");
 
-module.exports = {
+const thoughtController = {
   // Get all Thoughts
   async getThought(req, res) {
     Thought.find({})
