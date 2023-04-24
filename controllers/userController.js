@@ -85,7 +85,7 @@ module.exports = {
   },
 
   //adding a friend
-  addFriend({ params }, res) {
+  async addFriend({ params }, res) {
     user
       .findOneandUpdate(
         { _id: params.userId },
@@ -102,7 +102,7 @@ module.exports = {
   },
 
   //Remove friend
-  removeFriend({ params }, res) {
+  async removeFriend({ params }, res) {
     user
       .findOneandUpdate(
         { _id: params.userId },

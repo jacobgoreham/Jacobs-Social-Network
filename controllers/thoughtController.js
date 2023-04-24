@@ -58,22 +58,31 @@ module.exports = {
   },
 
   // Delete a Thought and associated apps
-  async deleteUser({ params }, res) {
+  async deleteThought({ params }, res) {
     Thought.findOneAndDelete({ _id: params.id })
       .then((dbThoughtData) => {
         if (!dbThoughtData) {
           return res.status(404).json({ message: "No Thought ID found..." });
         }
-        return Thought.deleteMany({ _id: { $in: dbThoughtData.thoughts } });
+        return user.findOneAndUpdate(
+          { thoughts: params.id },
+          { $pull: { thoughts: params.id } },
+          { new: true }
+        );
       })
-      .then(() => {
-        res.json({ message: "Thought and Posts have been deleted." });
+      .then((dbUserData) => {
+        if (!dbUserData) {
+          return res
+            .status(404)
+            .json({ message: "Thought Created. No User Id..." });
+        }
+        res.json({ message: "Thought Created" });
       })
       .catch((err) => res.json(err));
   },
 
   //Update Thought
-  async updateUser({ params, body }, res) {
+  async updateThought({ params, body }, res) {
     Thought.findOneAndUpdate({ _id: params.id }, body, {
       new: true,
       runValidators: true,
@@ -88,10 +97,10 @@ module.exports = {
   },
 
   //adding a reaction
-  addFriend({ params }, res) {
+  async addReaction({ params }, res) {
     Thought.findOneandUpdate(
-      { _id: params.userId },
-      { $addToSet: { friends: params.friendId } },
+      { _id: params.thoughtId },
+      { $addToSet: { reactions: body } },
       { new: true, runValidators: true }
     )
       .then((dbThoughtData) => {
@@ -104,18 +113,13 @@ module.exports = {
   },
 
   //Remove reaction
-  removeFriend({ params }, res) {
+  async removeReaction({ params }, res) {
     Thought.findOneandUpdate(
       { _id: params.userId },
-      { $pull: { friends: params.friendId } },
+      { $pull: { reactions: { reactionId: params.reactionId } } },
       { new: true }
     )
-      .then((dbThoughtData) => {
-        if (!dbThoughtData) {
-          return res.status(404).json({ message: "No Thought ID found..." });
-        }
-        res.json(dbThoughtData);
-      })
+      .then((dbThoughtData) => res.json(dbThoughtData))
       .catch((err) => res.json(err));
   },
 };
