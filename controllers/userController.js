@@ -1,4 +1,4 @@
-const { user, Application } = require("../models");
+const { user, Application, Thought, User } = require("../models");
 
 module.exports = {
   // Get all users
@@ -60,11 +60,63 @@ module.exports = {
         if (!dbUserData) {
           return res.status(404).json({ message: "No user ID found..." });
         }
-        //Add deleteMany for all thoughts...
+        return Thought.deleteMany({ _id: { $in: dbUserData.thoughts } });
       })
       .then(() => {
         res.json({ message: "user and Posts have been deleted." });
       })
       .catch((err) => res.json(err));
   },
+
+  //UpdateTHE USERRRRRR
+  async updateUser({ params, body }, res) {
+    user
+      .findOneAndUpdate({ _id: params.id }, body, {
+        new: true,
+        runValidators: true,
+      })
+      .then((dbUserData) => {
+        if (!dbUserData) {
+          return res.status(404).json({ message: "No user ID found..." });
+        }
+        res.json(dbUserData);
+      })
+      .catch((err) => res.json(err));
+  },
+
+  //adding a friend
+  addFriend({ params }, res) {
+    user
+      .findOneandUpdate(
+        { _id: params.userId },
+        { $addToSet: { friends: params.friendId } },
+        { new: true, runValidators: true }
+      )
+      .then((dbUserData) => {
+        if (!dbUserData) {
+          return res.status(404).json({ message: "No user ID found..." });
+        }
+        res.json(dbUserData);
+      })
+      .catch((err) => res.json(err));
+  },
+
+  //Remove friend
+  removeFriend({ params }, res) {
+    user
+      .findOneandUpdate(
+        { _id: params.userId },
+        { $pull: { friends: params.friendId } },
+        { new: true }
+      )
+      .then((dbUserData) => {
+        if (!dbUserData) {
+          return res.status(404).json({ message: "No user ID found..." });
+        }
+        res.json(dbUserData);
+      })
+      .catch((err) => res.json(err));
+  },
 };
+
+module.exports = userController;
