@@ -1,9 +1,10 @@
-const { User, Application } = require("../models");
+const { user, Application } = require("../models");
 
 module.exports = {
   // Get all users
   async getUsers(req, res) {
-    User.find({})
+    user
+      .find({})
       .populate({
         path: "friends",
         select: "-__v",
@@ -18,7 +19,8 @@ module.exports = {
   },
   // Get a user by ID
   async getUserId({ params }, res) {
-    User.findOne({ _id: params.id })
+    user
+      .findOne({ _id: params.id })
       .populate({
         path: "thoughts",
         select: "-__v",
@@ -30,7 +32,7 @@ module.exports = {
       .select("-__v")
       .then((dbUserData) => {
         if (!dbUserData) {
-          return res.status(404).json({ message: "No User ID found..." });
+          return res.status(404).json({ message: "No user ID found..." });
         }
         res.json(dbUserData);
       })
@@ -41,27 +43,28 @@ module.exports = {
   },
 
   // create a new user
-  async createUser(req, res) {
-    try {
-      const user = await User.create(req.body);
-      res.json(user);
-    } catch (err) {
-      res.status(500).json(err);
-    }
+  async createUser({ body }, res) {
+    user
+      .create(body)
+      .then((dbUserData) => res.json(dbUserData))
+      .catch((err) => {
+        console.log(err);
+        res.sendStatus(400);
+      });
   },
   // Delete a user and associated apps
-  async deleteUser(req, res) {
-    try {
-      const user = await User.findOneAndDelete({ _id: req.params.userId });
-
-      if (!user) {
-        return res.status(404).json({ message: "No user with that ID" });
-      }
-
-      await Application.deleteMany({ _id: { $in: user.applications } });
-      res.json({ message: "User and associated apps deleted!" });
-    } catch (err) {
-      res.status(500).json(err);
-    }
+  async deleteUser({ params }, res) {
+    user
+      .findOneAndDelete({ _id: params.id })
+      .then((dbUserData) => {
+        if (!dbUserData) {
+          return res.status(404).json({ message: "No user ID found..." });
+        }
+        //Add deleteMany for all thoughts...
+      })
+      .then(() => {
+        res.json({ message: "user and Posts have been deleted." });
+      })
+      .catch((err) => res.json(err));
   },
 };
