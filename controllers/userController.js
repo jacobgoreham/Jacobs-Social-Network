@@ -1,8 +1,8 @@
-const { user, Application, Thought, User } = require("../models");
+const { user, Thought } = require("../models");
 
 module.exports = {
   // Get all users
-  async getUsers(req, res) {
+  async getUser(req, res) {
     user
       .find({})
       .populate({

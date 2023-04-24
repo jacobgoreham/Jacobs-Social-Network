@@ -2,7 +2,7 @@ const { user, Thought } = require("../models");
 
 module.exports = {
   // Get all Thoughts
-  async getThoughts(req, res) {
+  async getThought(req, res) {
     Thought.find({})
       .populate({
         path: "reactions",
