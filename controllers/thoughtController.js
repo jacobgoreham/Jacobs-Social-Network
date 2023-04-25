@@ -1,9 +1,9 @@
-const { user, Thought } = require("../models");
+const db = require("../models");
 
 const thoughtController = {
   // Get all Thoughts
   async getThought(req, res) {
-    Thought.find({})
+    db.Thought.find({})
       .populate({
         path: "reactions",
         select: "-__v",
@@ -18,7 +18,7 @@ const thoughtController = {
   },
   // Get a Thought by ID
   async getThoughtId({ params }, res) {
-    Thought.findOne({ _id: params.id })
+    db.Thought.findOne({ _id: params.id })
       .populate({
         path: "thoughts",
         select: "-__v",
@@ -38,7 +38,7 @@ const thoughtController = {
 
   // create a new Thought
   async createThought({ params, body }, res) {
-    Thought.create(body)
+    db.Thought.create(body)
       .then(({ _id }) => {
         return user.findOneAndUpdate(
           { _id: body.userId },
@@ -59,7 +59,7 @@ const thoughtController = {
 
   // Delete a Thought and associated apps
   async deleteThought({ params }, res) {
-    Thought.findOneAndDelete({ _id: params.id })
+    db.Thought.findOneAndDelete({ _id: params.id })
       .then((dbThoughtData) => {
         if (!dbThoughtData) {
           return res.status(404).json({ message: "No Thought ID found..." });
@@ -83,7 +83,7 @@ const thoughtController = {
 
   //Update Thought
   async updateThought({ params, body }, res) {
-    Thought.findOneAndUpdate({ _id: params.id }, body, {
+    db.Thought.findOneAndUpdate({ _id: params.id }, body, {
       new: true,
       runValidators: true,
     })
@@ -98,7 +98,7 @@ const thoughtController = {
 
   //adding a reaction
   async addReaction({ params }, res) {
-    Thought.findOneandUpdate(
+    db.Thought.findOneandUpdate(
       { _id: params.thoughtId },
       { $addToSet: { reactions: body } },
       { new: true, runValidators: true }
@@ -114,7 +114,7 @@ const thoughtController = {
 
   //Remove reaction
   async removeReaction({ params }, res) {
-    Thought.findOneandUpdate(
+    db.Thought.findOneandUpdate(
       { _id: params.userId },
       { $pull: { reactions: { reactionId: params.reactionId } } },
       { new: true }

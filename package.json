@@ -1,7 +1,7 @@
 {
-  "name": "26-Stu_Mongoose-CRUD",
+  "name": "jacobs-social-network",
   "version": "1.0.0",
-  "description": "Reverse engineer developer activity for CRUD methods in Mongoose",
+  "description": "Social Network",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
@@ -10,7 +10,7 @@
     "seed": "node utils/seed"
   },
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "mongoose": "^7.0.2"
   },
   "devDependencies": {

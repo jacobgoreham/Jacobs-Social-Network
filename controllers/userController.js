@@ -1,10 +1,9 @@
-const { user, Thought } = require("../models");
+const db = require("../models");
 
 const userController = {
   // Get all users
-  async getUser(req, res) {
-    user
-      .find({})
+  getUser(req, res) {
+    db.User.find({})
       .populate({
         path: "friends",
         select: "-__v",
@@ -19,8 +18,7 @@ const userController = {
   },
   // Get a user by ID
   async getUserId({ params }, res) {
-    user
-      .findOne({ _id: params.id })
+    db.User.findOne({ _id: params.id })
       .populate({
         path: "thoughts",
         select: "-__v",
@@ -43,19 +41,14 @@ const userController = {
   },
 
   // create a new user
-  async createUser({ body }, res) {
-    user
-      .create(body)
+  createUser({ body }, res) {
+    db.User.create(body)
       .then((dbUserData) => res.json(dbUserData))
-      .catch((err) => {
-        console.log(err);
-        res.sendStatus(400);
-      });
+      .catch((err) => res.json(err));
   },
   // Delete a user and associated apps
   async deleteUser({ params }, res) {
-    user
-      .findOneAndDelete({ _id: params.id })
+    db.User.findOneAndDelete({ _id: params.id })
       .then((dbUserData) => {
         if (!dbUserData) {
           return res.status(404).json({ message: "No user ID found..." });
@@ -70,11 +63,10 @@ const userController = {
 
   //UpdateTHE USERRRRRR
   async updateUser({ params, body }, res) {
-    user
-      .findOneAndUpdate({ _id: params.id }, body, {
-        new: true,
-        runValidators: true,
-      })
+    db.User.findOneAndUpdate({ _id: params.id }, body, {
+      new: true,
+      runValidators: true,
+    })
       .then((dbUserData) => {
         if (!dbUserData) {
           return res.status(404).json({ message: "No user ID found..." });
@@ -86,12 +78,11 @@ const userController = {
 
   //adding a friend
   async addFriend({ params }, res) {
-    user
-      .findOneandUpdate(
-        { _id: params.userId },
-        { $addToSet: { friends: params.friendId } },
-        { new: true, runValidators: true }
-      )
+    db.User.findOneAndUpdate(
+      { _id: params.userId },
+      { $addToSet: { friends: params.friendId } },
+      { new: true, runValidators: true }
+    )
       .then((dbUserData) => {
         if (!dbUserData) {
           return res.status(404).json({ message: "No user ID found..." });
@@ -103,12 +94,11 @@ const userController = {
 
   //Remove friend
   async removeFriend({ params }, res) {
-    user
-      .findOneandUpdate(
-        { _id: params.userId },
-        { $pull: { friends: params.friendId } },
-        { new: true }
-      )
+    db.User.findOneAndUpdate(
+      { _id: params.userId },
+      { $pull: { friends: params.friendId } },
+      { new: true }
+    )
       .then((dbUserData) => {
         if (!dbUserData) {
           return res.status(404).json({ message: "No user ID found..." });
